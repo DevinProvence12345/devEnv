@@ -1,0 +1,35 @@
+version: "3.3"
+
+services: 
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        #We can rm port mappings because nginx takes care of them
+        #ports: 
+        #    - "4000:4000"
+        restart: unless-stopped
+        volumes: 
+            - ./backend/node_modules:/usr/app/node_modules
+    frontend:
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+        #ports: 
+        #    - "3000:3000"
+        restart: unless-stopped
+        environment:
+            #tell docker to refresh frontend app everytime source code is modified
+            CHOKIDAR_USEPOLLING: "true"
+        volumes: 
+            - ./client/node_modules:/usr/app/node_modules
+            - ./client:/usr/app
+    proxy: 
+        image: nginx:latest
+        restart: unless-stopped
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+ 
