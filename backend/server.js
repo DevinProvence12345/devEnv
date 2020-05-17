@@ -4,6 +4,13 @@ console.log("Backend Server is starting....");
 //This is a minimalist web-framework for NodeJS
 var express = require("express");
 
+// //GraphQL Playlist Dependencies
+// const graphqlHTTP = require('express-graphql');
+// const schema = require('./schema/schema');
+// const mongoose = require('mongoose');
+// const cors = require('cors');
+
+
 //This is a parser middleware, that helps to parse the incoming requests' body
 var bodyparser = require("body-parser");
 
@@ -18,6 +25,24 @@ var morgan = require("morgan");
 
 // Init Express app 
 var app = express();
+
+// //allow cross-origin requests
+// app.use(cors());
+
+//  //connect to DB
+//  var mongoDB = 'mongodb+srv://testAuth:bhsmap@cluster0-fnkyq.gcp.mongodb.net/test?retryWrites=true&w=majority';
+//  mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true});
+//  var db = mongoose.connection;
+//  db.once('open', () => {
+//      console.log('connected to db');
+//  })
+//  db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+// app.use('/graphql',graphqlHTTP({
+//    schema, 
+//    graphiql: true
+// }));
+
 
 //Set the initial port of backend app
 app.set("port", 4000);
@@ -41,6 +66,7 @@ var handlerFn = (req, res, next) => {
     next();
 };
 
+///// serving json data ///////////////
 //Initial route
 app.get("/", handlerFn, (req, res) => {
     res.redirect("/api");
@@ -54,7 +80,26 @@ app.route("/api").get(handlerFn, (req, res) => {
 //Cars list 
 app.route("/api/cars").get(handlerFn, (req, res) => {
     res.sendFile(__dirname + "/public/cars.json");
-});
+}); 
+/////////////////////////////////////
+
+
+        //callback route from google
+ app.route("/signin/callback").get(handlerFn, (req, res) => {
+    //declare vars from query string api return for later use
+    console.log(req.query);
+    let state = req.query.state;
+    let code = req.query.code;
+    let scope = req.query.scope;
+    let authuser = req.query.authuser;
+    let hd = req.query.hd;
+    let prompt = req.queryprompt;
+     res.send('example with route params')
+ });
+
+
+
+ //ERR HANDLING ROUTES/////////////////////////////
 
 // Route for handling 404 request(unavailable routes)
 app.use(function(req, res, next) {
@@ -69,10 +114,15 @@ function clientErrorHandler(err, req, res, next) {
       next(err);  
     }
 }
-
 app.use(clientErrorHandler);
+
+
+/////////////////////////////////////////////////
+
 
 //start the express server
 app.listen(app.get("port"), () =>
 console.log(`App started on port ${app.get("port")}`)
 );
+
+module.exports = app;

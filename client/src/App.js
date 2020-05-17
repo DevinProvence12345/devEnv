@@ -23,6 +23,7 @@ const App = () => {
           );
         })}
       </div>
+      <a href="https://accounts.google.com/o/oauth2/auth?scope=https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile&access_type=offline&include_granted_scopes=true&response_type=code&state=state_parameter_passthrough_value&redirect_uri=http://localhost:4000/signin/callback&client_id=243566847102-u4dk85cmjr12mh2knrpv3ins2tcrps8u.apps.googleusercontent.com">Sign in with google</a>
     </div>
   );
 };
