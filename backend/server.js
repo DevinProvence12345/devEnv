@@ -10,6 +10,9 @@ var express = require("express");
 // const mongoose = require('mongoose');
 // const cors = require('cors');
 
+//axios - handles HTTP requests
+const axios = require("axios");
+
 
 //This is a parser middleware, that helps to parse the incoming requests' body
 var bodyparser = require("body-parser");
@@ -85,18 +88,38 @@ app.route("/api/cars").get(handlerFn, (req, res) => {
 
 
         //callback route from google
- app.route("/signin/callback").get(handlerFn, (req, res) => {
+
+ app.get("/signin/callback", (req, res, next) => {
     //declare vars from query string api return for later use
     console.log(req.query);
-    let state = req.query.state;
-    let code = req.query.code;
-    let scope = req.query.scope;
-    let authuser = req.query.authuser;
     let hd = req.query.hd;
-    let prompt = req.queryprompt;
-     res.send('example with route params')
- });
+    let authCode = req.query.code;
 
+    if(hd !== 'guhsd.net') {
+        console.log('you are not good to pass')
+        // The return is for not continueing to execute the controller
+        return res.redirect(301, 'http://localhost:3000/?error=invalid_domain');
+    } 
+
+    res.send('making a post to exchange auth code for tokens')
+        axios.post('https://oauth2.googleapis.com/token', {
+               client_id: '243566847102-u4dk85cmjr12mh2knrpv3ins2tcrps8u.apps.googleusercontent.com',
+               client_secret: 'N8MGvBc9ygb9XtGcuO99jtR3',
+               code: authCode,
+               grant_type: 'authorization_code',
+               //goolge handles redirect to frontend
+               redirect_uri: 'http://localhost:3000'
+       })
+       .then((response) => {
+           console.log('Your token must to be here');
+           console.log(response);
+       })
+       .catch((error) => {
+           console.log('Error happened');
+           next(error);
+       });
+ });
+ 
 
 
  //ERR HANDLING ROUTES/////////////////////////////
